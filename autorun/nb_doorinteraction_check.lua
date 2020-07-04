@@ -19,34 +19,44 @@ local function GetDoor(ent)
 	doors[13] = "models/props_radiostation/radio_metaldoor01b.mdl"
 	doors[14] = "models/props_radiostation/radio_metaldoor01c.mdl"
 
+	if !IsValid( ent ) then return false end
 
 	for k,v in pairs( doors ) do
-		if !IsValid( ent ) then break end
 		if ent:GetModel() == v and string.find(ent:GetClass(), "door") then
-			return "door"
+			return true
 		end
 	end
 
 end
 
 if SERVER then
+	local done = false
+
 	hook.Add( "PlayerInitialSpawn", "nb_doorinteraction_check", function()
 
-		GetConVar( "nb_doorinteraction" ):SetInt(0)
-	
+		if done then return end
+
+		-- first we say we have no doors
+		local nb_doorinteraction = GetConVar( "nb_doorinteraction" )
+		nb_doorinteraction:SetInt(0)
+
 		for k,v in pairs( ents.GetAll() ) do
-			if IsValid( v ) then
-				if GetDoor( v ) then
-					GetConVar( "nb_doorinteraction" ):SetInt(1)
-					print("NB 3.0: Found doors on map, Door interaction (TRUE)")
-					break
-				end
+			if IsValid( v ) and GetDoor( v ) then
+				-- if we found a door, we don't need to continue
+				nb_doorinteraction:SetInt(1)
+
+				break
 			end
 		end
-		
-		if GetConVar( "nb_doorinteraction" ):GetInt() == 0 then
-			print("NB 3.0: Found doors on map, Door interaction (FALSE)")
+
+		if GetConVar( "nb_doorinteraction" ):GetInt() == 1 then
+			print("NB 3.0: Found doors on map, Door interaction (TRUE)")
+		else
+			print("NB 3.0: Found no doors on map, Door interaction (FALSE)")
 		end
-		
+
+		-- we have done this, no need to do it again
+		done = true
+
 	end)
 end
