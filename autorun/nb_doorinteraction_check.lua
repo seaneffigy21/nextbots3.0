@@ -32,20 +32,20 @@ end
 if SERVER then
 	hook.Add( "PlayerInitialSpawn", "nb_doorinteraction_check", function()
 
+		GetConVar( "nb_doorinteraction" ):SetInt(0)
+	
 		for k,v in pairs( ents.GetAll() ) do
 			if IsValid( v ) then
 				if GetDoor( v ) then
 					GetConVar( "nb_doorinteraction" ):SetInt(1)
-				else
-					GetConVar( "nb_doorinteraction" ):SetInt(0)
+					print("NB 3.0: Found doors on map, Door interaction (TRUE)")
+					break
 				end
 			end
 		end
 		
-		if GetConVar( "nb_doorinteraction" ):GetInt() == 1 then
-			print("NB 3.0: Found doors on map, Door interaction (TRUE)")
-		else
-			print("NB 3.0: Found no doors on map, Door interaction (FALSE)")
+		if GetConVar( "nb_doorinteraction" ):GetInt() == 0 then
+			print("NB 3.0: Found doors on map, Door interaction (FALSE)")
 		end
 		
 	end)
